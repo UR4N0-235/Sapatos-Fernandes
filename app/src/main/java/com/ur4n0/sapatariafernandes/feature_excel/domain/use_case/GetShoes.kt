@@ -9,6 +9,6 @@ class GetShoes(
     private val repository: ShoeRepository
 ) {
     operator fun invoke(): Flow<Resource<List<Shoe>>>{
-        return repository.getShoes()
+        return repository.getShoes(null)
     }
 }

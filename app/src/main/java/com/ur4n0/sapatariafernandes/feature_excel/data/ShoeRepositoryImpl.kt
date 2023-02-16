@@ -10,27 +10,19 @@ import kotlinx.coroutines.flow.flow
 class ShoeRepositoryImpl(
     private val shoeDao: ShoeDAO,
 ): ShoeRepository {
-    override fun getShoes(): Flow<Resource<List<Shoe>>> = flow {
-        emit(Resource.Loading())
+    override fun getShoes(code: Long?): Flow<Resource<List<Shoe>>> = flow {
+            emit(Resource.Loading())
 
-        val shoes = shoeDao.getShoes().map { it.toShoe() }
-        emit(Resource.Loading(data = shoes))
+            val shoes = if ( code == null ) shoeDao.getShoes().map { it.toShoe() }
+            else shoeDao.getShoe(code).map{ it.toShoe()}
 
-        // TODO("code to update database list, getting all shoes from excel file")
+            emit(Resource.Loading(data = shoes))
 
-        val newShoes = shoeDao.getShoes().map { it.toShoe() }
-        emit(Resource.Success(newShoes))
-    }
+            // TODO("code to update database list, getting all shoes from excel file")
 
-    override fun getShoe(code: Long): Flow<Resource<List<Shoe>>> = flow {
-        emit(Resource.Loading())
+            val newShoes = if ( code == null ) shoeDao.getShoes().map { it.toShoe() }
+            else shoeDao.getShoe(code).map{ it.toShoe()}
 
-        val shoe = shoeDao.getShoe(code).map { it.toShoe() }
-        emit(Resource.Loading(data = shoe))
-
-        // TODO("code to update database list, getting all shoes from excel file")
-
-        val newShoe = shoeDao.getShoe(code).map { it.toShoe() }
-        emit(Resource.Success(newShoe))
+            emit(Resource.Success(newShoes))
     }
 }
