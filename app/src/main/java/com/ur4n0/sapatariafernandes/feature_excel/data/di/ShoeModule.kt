@@ -4,11 +4,9 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.ur4n0.sapatariafernandes.feature_excel.data.ShoeRepositoryImpl
-import com.ur4n0.sapatariafernandes.feature_excel.data.local.database_source.ShoeDAO
 import com.ur4n0.sapatariafernandes.feature_excel.data.local.database_source.ShoeDatabase
-import com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.ShoeExcelFile
+import com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.ShoeExcelDataManipulation
 import com.ur4n0.sapatariafernandes.feature_excel.domain.repository.ShoeRepository
-import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoe
 import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoes
 import dagger.Module
 import dagger.Provides
@@ -22,20 +20,14 @@ import javax.inject.Singleton
 object ShoeModule {
     @Provides
     @Singleton
-    fun provideGetShoeUseCase(repository: ShoeRepository): GetShoe{
-        return GetShoe(repository)
-    }
-
-    @Provides
-    @Singleton
     fun provideGetShoesUseCase(repository: ShoeRepository): GetShoes{
         return GetShoes(repository)
     }
 
     @Provides
     @Singleton
-    fun provideShoeRepository(dao: ShoeDatabase): ShoeRepositoryImpl{
-        return ShoeRepositoryImpl(dao.dao)
+    fun provideShoeRepository(dao: ShoeDatabase, shoeExcel: ShoeExcelDataManipulation): ShoeRepositoryImpl{
+        return ShoeRepositoryImpl(dao.dao, shoeExcel)
     }
 
     @Provides
@@ -48,7 +40,7 @@ object ShoeModule {
 
     @Provides
     @Singleton
-    fun provideShoeExcelFile(@ApplicationContext context: Context): ShoeExcelFile{
-        return ShoeExcelFile()
+    fun provideShoeExcelDataManipulation(@ApplicationContext context: Context): ShoeExcelDataManipulation{
+        return ShoeExcelDataManipulation(context)
     }
 }
