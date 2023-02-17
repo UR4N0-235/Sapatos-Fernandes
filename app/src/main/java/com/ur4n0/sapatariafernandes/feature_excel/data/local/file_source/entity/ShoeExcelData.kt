@@ -1,6 +1,6 @@
-package com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source
+package com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.entity
 
-import com.ur4n0.sapatariafernandes.feature_excel.domain.model.Shoe
+import com.ur4n0.sapatariafernandes.feature_excel.data.local.database_source.entity.ShoeEntity
 
 data class ShoeExcelData(
     val code: Long,
@@ -10,8 +10,8 @@ data class ShoeExcelData(
     val price: Double,
     val stock: Int,
 ){
-    fun toShoe(): Shoe {
-        return Shoe(
+    fun toShoeEntity(): ShoeEntity {
+        return ShoeEntity(
             code = code,
             name = name,
             color = color,

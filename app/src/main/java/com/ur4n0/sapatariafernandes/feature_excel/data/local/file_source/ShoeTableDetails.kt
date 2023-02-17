@@ -1,7 +1,5 @@
 package com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source
 
-import org.apache.poi.ss.usermodel.Row
-
 data class ShoeExcelInfo(
     var headerRow: Int,
     var codeColumn: Int,

@@ -1,33 +1,46 @@
 package com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source
 
+import android.content.Context
+import com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.entity.ShoeExcelData
 import org.apache.commons.math3.exception.NotANumberException
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellReference
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
-class ShoeExcelDataManipulation {
+private const val EXCEL_FILE_NAME = "sapatos.xlsx"
+
+class ShoeExcelDataManipulation(context: Context) {
+    private var context: Context? = context
     private val header = ShoeExcelInfo(0,0,0,0,0,0, 0)
     private var maxValueRowNumber: Int = 0
 
-    fun getShoes(workbook: Workbook):List<ShoeExcelData> {
+    fun getShoes():List<ShoeExcelData> {
+        val workbook: Workbook = GetExcelFile()
         var shoesListToReturn: ArrayList<ShoeExcelData> = ArrayList()
         val sheet = workbook.getSheetAt(0)
+
 
         if(header.headerRow + maxValueRowNumber == 0) defineHeaderAndMaxNowEmptyRow(sheet)
 
         for(index in header.headerRow..maxValueRowNumber ){
             val row = sheet.getRow(index)
             try{
-                shoesListToReturn.add(ShoeExcelData(
+                shoesListToReturn.add(
+                    ShoeExcelData(
                     row.getCell(header.codeColumn).numericCellValue.toLong(),
                     row.getCell(header.colorColumn).stringCellValue,
                     row.getCell(header.nameColumn).stringCellValue,
                     row.getCell(header.sizeColumn).numericCellValue.toInt(),
                     row.getCell(header.priceColumn).numericCellValue,
                     row.getCell(header.stockColumn).numericCellValue.toInt(),
-                ))
+                )
+                )
             }catch(err: NotANumberException){
                 continue
             }
@@ -35,6 +48,17 @@ class ShoeExcelDataManipulation {
         return shoesListToReturn.toList()
     }
 
+    fun SaveExcelFile(workbook: Workbook): Boolean{
+        return try {
+            val fileOutput = File(context!!.filesDir, EXCEL_FILE_NAME)
+            workbook.write(FileOutputStream(fileOutput))
+            true
+        }catch (err: IOException){
+            false
+        }catch(err: NullPointerException){
+            false
+        }
+    }
 
     private fun defineHeaderAndMaxNowEmptyRow(sheet: Sheet){
         for(row:Row in sheet){
@@ -58,7 +82,10 @@ class ShoeExcelDataManipulation {
         }
     }
 
-    private fun defineWhereIsHeaderRow(){
+    private fun GetExcelFile(): Workbook{
+        if(context == null) return throw NullPointerException()
 
+        val workbookFile = File(context!!.filesDir, EXCEL_FILE_NAME);
+        return XSSFWorkbook(workbookFile);
     }
 }
