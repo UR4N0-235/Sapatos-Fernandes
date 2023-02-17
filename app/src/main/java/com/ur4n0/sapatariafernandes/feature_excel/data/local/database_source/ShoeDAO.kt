@@ -11,9 +11,19 @@ interface ShoeDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShoe(shoe: ShoeEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShoe(shoe: List<ShoeEntity>)
+
     @Query("SELECT * FROM shoeentity")
     suspend fun getShoes(): List<ShoeEntity>
 
     @Query("SELECT * FROM shoeentity WHERE code LIKE '%' || :code || '%'")
     suspend fun getShoe(code: Long): List<ShoeEntity>
+
+    @Query("DELETE FROM shoeentity where code == :code")
+    suspend fun deleteShoe(code: Long)
+
+    @Query("DELETE FROM shoeentity where code IN (:codes)")
+    suspend fun deleteShoe(codes: List<Long>)
+
 }
