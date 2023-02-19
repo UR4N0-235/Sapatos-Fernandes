@@ -1,8 +1,11 @@
 package com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source
 
 import android.content.Context
+import com.ur4n0.sapatariafernandes.R
 import com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.entity.ShoeExcelData
 import org.apache.commons.math3.exception.NotANumberException
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException
+import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -10,6 +13,7 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -20,11 +24,14 @@ class ShoeExcelDataManipulation(context: Context) {
     private val header = ShoeExcelInfo(0,0,0,0,0,0, 0)
     private var maxValueRowNumber: Int = 0
 
+    companion object{
+
+    }
+
     fun getShoes():List<ShoeExcelData> {
         val workbook: Workbook = GetExcelFile()
         var shoesListToReturn: ArrayList<ShoeExcelData> = ArrayList()
         val sheet = workbook.getSheetAt(0)
-
 
         if(header.headerRow + maxValueRowNumber == 0) defineHeaderAndMaxNowEmptyRow(sheet)
 
@@ -84,8 +91,32 @@ class ShoeExcelDataManipulation(context: Context) {
 
     private fun GetExcelFile(): Workbook{
         if(context == null) return throw NullPointerException()
+//        var workbook: File;
 
-        val workbookFile = File(context!!.filesDir, EXCEL_FILE_NAME);
-        return XSSFWorkbook(workbookFile);
+        try{
+           val workbookFile = OPCPackage.open(
+                File(context!!.filesDir, EXCEL_FILE_NAME)
+            );
+            return XSSFWorkbook(workbookFile);
+        }catch(err: InvalidFormatException){
+            installExcelFileOnInternalStorage()
+
+            val workbookFile = OPCPackage.open(
+                File(context!!.filesDir, EXCEL_FILE_NAME)
+            );
+            return XSSFWorkbook(workbookFile);
+        }
+    }
+
+    private fun installExcelFileOnInternalStorage(){
+        val excelFile = context!!.resources.openRawResource(
+            context!!.resources.getIdentifier("sapatos",
+                "raw", context!!.packageName
+            ));
+        val writeTo = FileOutputStream(File(context!!.filesDir, EXCEL_FILE_NAME))
+        excelFile.copyTo(writeTo)
+
+        excelFile.close()
+        writeTo.close()
     }
 }
