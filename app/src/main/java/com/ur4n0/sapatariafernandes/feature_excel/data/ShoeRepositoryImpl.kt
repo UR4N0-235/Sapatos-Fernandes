@@ -11,34 +11,69 @@ import kotlinx.coroutines.flow.flow
 class ShoeRepositoryImpl(
     private val shoeDao: ShoeDAO,
     private val shoeExcel: ShoeExcelDataManipulation
-): ShoeRepository {
-    override fun getShoes(code: Long?): Flow<Resource<List<Shoe>>> = flow {
-            emit(Resource.Loading())
+) : ShoeRepository {
+    override fun getAllShoes(): Flow<Resource<List<Shoe>>> = flow {
+        emit(Resource.Loading())
 
-            val databaseShoes = if ( code == null ) shoeDao.getShoes().map { it.toShoe() }
-            else shoeDao.getShoe(code).map{ it.toShoe()}
+        val databaseShoes = shoeDao.getShoes().map { it.toShoe() }
 
-            emit(Resource.Loading(data = databaseShoes))
+        emit(Resource.Loading(data = databaseShoes))
 
-            try{
-                val excelShoes = shoeExcel.getShoes().map{ it.toShoeEntity() }
-                shoeDao.deleteShoe(excelShoes.map{ it.code })
-                shoeDao.insertShoe(excelShoes.map{ it })
-            }catch(err: NullPointerException){
-                emit(Resource.Error(
+        try {
+            val excelShoes = shoeExcel.getShoes().map { it.toShoeEntity() }
+            shoeDao.deleteShoe(excelShoes.map { it.code })
+            shoeDao.insertShoe(excelShoes.map { it })
+        } catch (err: NullPointerException) {
+            emit(
+                Resource.Error(
                     message = "Algo deu errado...",
                     data = databaseShoes
-                ))
-            }catch(err: Exception){
-                emit(Resource.Error(
+                )
+            )
+        } catch (err: Exception) {
+            emit(
+                Resource.Error(
                     message = "Erro desconhecido",
                     data = databaseShoes
-                ))
-            }
+                )
+            )
+        }
 
-            val newShoes = if ( code == null ) shoeDao.getShoes().map { it.toShoe() }
-            else shoeDao.getShoe(code).map{ it.toShoe()}
+        val newShoes = shoeDao.getShoes().map { it.toShoe() }
 
-            emit(Resource.Success(newShoes))
+        emit(Resource.Success(newShoes))
+    }
+
+    override fun getShoesByCode(code: Long): Flow<Resource<List<Shoe>>> = flow {
+        emit(Resource.Loading())
+
+        val databaseShoes = shoeDao.getShoe(code).map { it.toShoe() }
+
+        emit(Resource.Loading(data = databaseShoes))
+
+        try {
+            val excelShoes = shoeExcel.getShoes().map { it.toShoeEntity() }
+            shoeDao.deleteShoe(excelShoes.map { it.code })
+            shoeDao.insertShoe(excelShoes.map { it })
+        } catch (err: NullPointerException) {
+            emit(
+                Resource.Error(
+                    message = "Algo deu errado...",
+                    data = databaseShoes
+                )
+            )
+        } catch (err: Exception) {
+            emit(
+                Resource.Error(
+                    message = "Erro desconhecido",
+                    data = databaseShoes
+                )
+            )
+        }
+
+        val newShoes = shoeDao.getShoe(code).map { it.toShoe() }
+
+        emit(Resource.Success(newShoes))
+
     }
 }

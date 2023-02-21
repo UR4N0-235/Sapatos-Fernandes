@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ur4n0.sapatariafernandes.core.util.Resource
 import com.ur4n0.sapatariafernandes.core.util.isValidLong
-import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoe
-import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoes
+import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetAllShoes
+import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoesByCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ShoeViewModel @Inject constructor(
-    private val getShoes: GetShoes,
-    private val getOneShoe: GetShoe
+    private val getAllShoes: GetAllShoes,
+    private val getShoesByCode: GetShoesByCode
 ): ViewModel() {
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
@@ -40,7 +40,7 @@ class ShoeViewModel @Inject constructor(
             searchJob?.cancel()
             searchJob = viewModelScope.launch{
                 delay(500L)
-                getOneShoe(query.toLong()).onEach { result ->
+                getShoesByCode(query.toLong()).onEach { result ->
                     when(result){
                         is Resource.Success -> {
                             _state.value = state.value.copy(
@@ -67,7 +67,7 @@ class ShoeViewModel @Inject constructor(
                 }.launchIn(this)
             }
         }else{
-            getShoes().onEach {result ->
+            getAllShoes().onEach { result ->
                 when(result){
                     is Resource.Success -> {
                         _state.value = state.value.copy(

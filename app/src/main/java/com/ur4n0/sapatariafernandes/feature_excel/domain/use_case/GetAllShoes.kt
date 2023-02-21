@@ -5,10 +5,10 @@ import com.ur4n0.sapatariafernandes.feature_excel.domain.model.Shoe
 import com.ur4n0.sapatariafernandes.feature_excel.domain.repository.ShoeRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetShoes(
+class GetAllShoes(
     private val repository: ShoeRepository
 ) {
     operator fun invoke(): Flow<Resource<List<Shoe>>>{
-        return repository.getShoes(null)
+        return repository.getAllShoes()
     }
 }

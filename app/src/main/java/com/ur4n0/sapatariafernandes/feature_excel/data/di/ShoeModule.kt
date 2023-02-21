@@ -7,7 +7,7 @@ import com.ur4n0.sapatariafernandes.feature_excel.data.ShoeRepositoryImpl
 import com.ur4n0.sapatariafernandes.feature_excel.data.local.database_source.ShoeDatabase
 import com.ur4n0.sapatariafernandes.feature_excel.data.local.file_source.ShoeExcelDataManipulation
 import com.ur4n0.sapatariafernandes.feature_excel.domain.repository.ShoeRepository
-import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetShoes
+import com.ur4n0.sapatariafernandes.feature_excel.domain.use_case.GetAllShoes
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,13 +20,16 @@ import javax.inject.Singleton
 object ShoeModule {
     @Provides
     @Singleton
-    fun provideGetShoesUseCase(repository: ShoeRepository): GetShoes{
-        return GetShoes(repository)
+    fun provideGetShoesUseCase(repository: ShoeRepository): GetAllShoes{
+        return GetAllShoes(repository)
     }
 
     @Provides
     @Singleton
-    fun provideShoeRepository(dao: ShoeDatabase, shoeExcel: ShoeExcelDataManipulation): ShoeRepositoryImpl{
+    fun provideShoeRepository(
+        dao: ShoeDatabase,
+        shoeExcel: ShoeExcelDataManipulation
+    ): ShoeRepositoryImpl{
         return ShoeRepositoryImpl(dao.dao, shoeExcel)
     }
 
